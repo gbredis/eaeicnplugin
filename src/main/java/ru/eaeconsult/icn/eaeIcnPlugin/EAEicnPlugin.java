@@ -1,4 +1,4 @@
-package ru.eaeconsult.icn.EAEicnPlugin;
+package ru.eaeconsult.icn.eaeIcnPlugin;
 
 import javax.servlet.http.HttpServletRequest;
 
