@@ -1,0 +1,32 @@
+<div>
+	<div data-dojo-type="idx.layout.TitlePane" open="true" collapsible=false
+		data-dojo-attach-point="_entryTemplatesPane"
+		title="${_nls.configPane.entryTemplatesSection.title}">
+	    <div data-dojo-type="dijit/layout/ContentPane"
+				data-dojo-attach-point="etTablePane">
+	    </div>
+	</div>
+	<div data-dojo-type="idx.layout.TitlePane" open="true" collapsible=false
+		data-dojo-attach-point="_genericPane"
+		title="${_nls.configPane.genericSection.title}">
+		<div data-dojo-type="dijit.layout.ContentPane" tabindex="0"
+			data-dojo-attach-point="_genericContainer" style="margin: 5px;">
+			<table class="propertyTable" role="presentation">
+				<tr>
+					<td class="propertyRowLabel"><span class="required">*</span> <label
+						for="${id}_externalRestServiceUrl">${_nls.configPane.externalRestServiceUrl.label}</label>&nbsp;
+						<div data-dojo-type="ecm.widget.HoverHelp"
+							data-dojo-attach-point="externalRestServiceUrlHoverHelp"
+							message="${_nls.configPane.externalRestServiceUrl.help}"></div></td>
+					<td class="propertyRowValue">
+						<div id="${id}_externalRestServiceUrl"
+							data-dojo-attach-point="externalRestServiceUrl"
+							data-dojo-attach-event="onKeyUp: _onFieldChange"
+							data-dojo-type="ecm.widget.ValidationTextBox" required="true"
+							trim="true" propercase="false"></div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
