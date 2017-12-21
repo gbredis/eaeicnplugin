@@ -18,6 +18,7 @@ import com.ibm.ecm.extension.PluginServiceCallbacks;
 import com.ibm.ecm.extension.PluginViewerDef;
 import com.ibm.ecm.extension.PluginRepositoryType;
 import com.ibm.ecm.extension.PluginAPI;
+import ru.eaeconsult.icn.eaeIcnPlugin.layouts.EAEMainLayout;
 
 import java.util.Locale;
 
@@ -99,6 +100,11 @@ public class EAEicnPlugin extends Plugin {
     }
 
     public PluginLayout[] getLayouts() {
+        if (pluginLayouts.length == 0) {
+            pluginLayouts = new PluginLayout[] {
+                    new EAEMainLayout()
+            };
+        }
         return pluginLayouts;
     }
 

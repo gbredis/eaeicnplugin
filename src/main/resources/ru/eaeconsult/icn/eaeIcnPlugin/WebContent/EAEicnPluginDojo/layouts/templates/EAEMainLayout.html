@@ -1,0 +1,36 @@
+<div class="ecmLayout">
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-attach-point="mainContainer"
+         data-dojo-props="gutters:false" class="contentPane">
+
+        <div data-dojo-type="dijit/layout/ContentPane"
+             data-dojo-props="region:'top'">
+            <div data-dojo-type="ecm/widget/Banner" data-dojo-attach-point="banner"
+                 data-dojo-props="showApplicationMenu:true">
+            </div>
+        </div>
+        <div data-dojo-type="dijit/layout/StackContainer"
+             data-dojo-attach-point="mainStackContainer"
+             data-dojo-props="region:'center'"
+             class="stackContainer">
+            <div data-dojo-type="ecm/widget/LoginPane" data-dojo-attach-point="loginPane" id="${id}_LoginPane"></div>
+            <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-attach-point="mainPane"
+                 data-dojo-props="gutters:false" class="launchBarPane" aria-label="${messages.product_name}">
+                <div data-dojo-type="ecm/widget/layout/_TabContainerBase" data-dojo-attach-point="eaeTabController"
+                     data-dojo-props="style:{width: '100%', height: '100%'},region: 'top'" tabStrip="true">
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="desktopTab"
+                         title="${_nls.desktopTabLabel}"
+                         data-dojo-props="style:{width: '100%', height: '100%'}, region: 'center'">
+                        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="globalToolbarArea"
+                             data-dojo-props="style:{width: '100%', height: '3%'},region:'top'" class="globalToolbar"
+                             style="display: none"></div>
+                        <div data-dojo-attach-point="launchBarContainer"
+                             data-dojo-type="ecm/widget/layout/LaunchBarContainer"
+                             data-dojo-props="style:{width: '100%', height: '100%'},region:'center'"
+                             class="launchBarContainer"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
