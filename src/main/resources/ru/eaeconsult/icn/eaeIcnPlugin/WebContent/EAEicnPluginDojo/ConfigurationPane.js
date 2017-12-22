@@ -19,7 +19,9 @@ define([
         "dijit/form/Button",
         "dojo/store/Memory",
         "dojo/on",
-        "dijit/form/CheckBox"
+        "dijit/form/CheckBox",
+        "./widgets/ConfigPaneEntryTemplates",
+        "dojo/domReady!"
     ],
     function(
         lang,
@@ -42,7 +44,8 @@ define([
         Button,
         Memory,
         on,
-        CheckBox
+        CheckBox,
+        ConfigPaneEntryTemplates
     ) {
 
         return declare("EAEicnPluginDojo.ConfigurationPane", [ PluginConfigurationPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -57,6 +60,26 @@ define([
             maxid_et: 0,
             maxid_dt: 0,
 
+            startup: function() {
+                this.inherited(arguments);
+                this.et = new ConfigPaneEntryTemplates({
+                    data: this.jsonConfig.etDataArray,
+                    parentWidget: this
+                });
+                this.et.placeAt(this.etTablePane.domNode);
+                this.et.startup();
+                this.et.createGrid();
+            },
+
+            load: function(callback) {
+                if (this.configurationString) {
+                    this.jsonConfig = JSON.parse(this.configurationString);
+                    this.externalRestServiceUrl.set('value', this.jsonConfig.externalRestServiceUrl);
+                }
+                //this.createTypesGrid();
+                //this.createDesktopsGrid();
+            },
+
             addEtRow: function() {
                 var newItem={
                     id: this.maxid_et+1,
@@ -68,8 +91,8 @@ define([
                     noNew: false
                 };
                 this.mstore_et.add(newItem);
-                this.etTypesGrid.model.clearCache();
-                this.etTypesGrid.setStore(this.mstore_et);
+                this.tableGrid.model.clearCache();
+                this.tableGrid.setStore(this.mstore_et);
                 this._onFieldChange();
                 this.maxid_et++;
             },
@@ -93,12 +116,12 @@ define([
             },
 
             delEtRow: function() {
-                var row = this.etTypesGrid.body._focusCellRow;
+                var row = this.tableGrid.body._focusCellRow;
                 if (row) {
                     var id = row;
                     this.mstore_et.remove(id);
-                    this.etTypesGrid.model.clearCache();
-                    this.etTypesGrid.setStore(this.mstore_et);
+                    this.tableGrid.model.clearCache();
+                    this.tableGrid.setStore(this.mstore_et);
                     this._onFieldChange();
                 }
             },
@@ -115,12 +138,9 @@ define([
             },
 
             createTypesGrid: function() {
-                if (this.etTypesGrid) {
-                    this.etTypesGrid.destroyRecursive();
+                if (this.tableGrid) {
+                    this.tableGrid.destroyRecursive();
                 }
-
-                this.mstore_et = new Memory({data: this.etdata});
-
                 var toolbar = new Toolbar({}, "toolbar");
                 var addButton = new Button({
                     label: common.configPane.entryTemplatesSection.btnAdd,
@@ -135,7 +155,7 @@ define([
                 toolbar.addChild(addButton);
                 toolbar.addChild(delButton);
                 toolbar.startup();
-                this.etTypesGrid = new Grid({
+                this.tableGrid = new Grid({
                     cacheClass: Cache,
                     store: this.mstore_et,
                     selectRowTriggerOnCell: true,
@@ -155,14 +175,11 @@ define([
                         Bar
                     ]
                 })
-                this.etTypesGrid.placeAt(this.etTablePane);
+                this.tableGrid.placeAt(this.etTablePane);
 
-                this.etTypesGrid.edit.connect(this.etTypesGrid.edit, "onApply", lang.hitch(this, function(){
+                this.tableGrid.edit.connect(this.tableGrid.edit, "onApply", lang.hitch(this, function(){
                     this._onFieldChange();
                 }))
-                this.etTypesGrid.startup();
-                this.etTypesGrid.model.clearCache();
-                this.etTypesGrid.setStore(this.mstore_et);
 
                 if (this.jsonConfig && this.jsonConfig.etDataArray) {
                     this.etdata=this.jsonConfig.etDataArray;
@@ -173,17 +190,15 @@ define([
                 };
 
                 this.mstore_et = new Memory({data: this.etdata});
-                this.etTypesGrid.startup();
-                this.etTypesGrid.model.clearCache();
-                this.etTypesGrid.setStore(this.mstore_et);
-
+                this.tableGrid.startup();
+                this.tableGrid.model.clearCache();
+                this.tableGrid.setStore(this.mstore_et);
             },
 
             createDesktopsGrid: function() {
                 if (this.desktopsGrid) {
                     this.desktopsGrid.destroyRecursive();
                 }
-                this.mstore_dt = new Memory({data: this.dtdata});
 
                 var toolbar = new Toolbar({}, "toolbar");
                 var addButton = new Button({
@@ -225,14 +240,9 @@ define([
                 this.desktopsGrid.edit.connect(this.desktopsGrid.edit, "onApply", lang.hitch(this, function(){
                     this._onFieldChange();
                 }))
-                this.desktopsGrid.startup();
-                this.desktopsGrid.model.clearCache();
-                this.desktopsGrid.setStore(this.mstore_et);
 
                 if (this.jsonConfig && this.jsonConfig.desktopConfigsArray) {
                     this.dtdata=this.jsonConfig.desktopConfigsArray;
-                } else {
-
                 }
 
                 for (i=0; i<this.dtdata.length; i++) {
@@ -245,15 +255,6 @@ define([
                 this.desktopsGrid.setStore(this.mstore_dt);
             },
 
-            load: function(callback) {
-                if (this.configurationString) {
-                    this.jsonConfig = JSON.parse(this.configurationString);
-                    this.externalRestServiceUrl.set('value', this.jsonConfig.externalRestServiceUrl);
-                }
-                this.createTypesGrid();
-                this.createDesktopsGrid();
-            },
-
             _onFieldChange : function() {
                 var repoId = Desktop.defaultRepositoryId;
                 var repo = Desktop.getRepository(this.repoId);
@@ -262,15 +263,15 @@ define([
                 paramAdmin.externalRestServiceUrl = this.externalRestServiceUrl.get('value');
 
                 var etDataArray = [];
-                for (i=0; i<this.mstore_et.data.length; i++) {
+                for (i=0; i<this.et.mstore.data.length; i++) {
                     etDataRow={};
-                    etDataRow.id = this.mstore_et.data[i].id;
-                    etDataRow.objectType = this.mstore_et.data[i].objectType;
-                    etDataRow.objectTypeDisplay = this.mstore_et.data[i].objectTypeDisplay;
-                    etDataRow.entryTemplate = this.mstore_et.data[i].entryTemplate;
-                    etDataRow.entryTemplateRO = this.mstore_et.data[i].entryTemplateRO;
-                    etDataRow.uniqueProperty = this.mstore_et.data[i].uniqueProperty;
-                    etDataRow.noNew = this.mstore_et.data[i].noNew;
+                    etDataRow.id = this.et.mstore.data[i].id;
+                    etDataRow.objectType = this.et.mstore.data[i].objectType;
+                    etDataRow.objectTypeDisplay = this.et.mstore.data[i].objectTypeDisplay;
+                    etDataRow.entryTemplate = this.et.mstore.data[i].entryTemplate;
+                    etDataRow.entryTemplateRO = this.et.mstore.data[i].entryTemplateRO;
+                    etDataRow.uniqueProperty = this.et.mstore.data[i].uniqueProperty;
+                    etDataRow.noNew = this.et.mstore.data[i].noNew;
                     etDataArray.push(etDataRow);
                 }
                 paramAdmin.etDataArray = etDataArray;
