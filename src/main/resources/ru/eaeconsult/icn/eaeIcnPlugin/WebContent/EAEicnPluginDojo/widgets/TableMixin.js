@@ -11,10 +11,7 @@ define([
         "gridx/modules/Bar",
         "dijit/Toolbar",
         "dijit/form/Button",
-        "dojo/store/Memory",
-        "dojo/on",
-        "dijit/form/CheckBox",
-        "dijit/layout/ContentPane"
+        "dojo/store/Memory"
     ],
     function(
         lang,
@@ -29,10 +26,7 @@ define([
         Bar,
         Toolbar,
         Button,
-        Memory,
-        on,
-        CheckBox,
-        ContentPane
+        Memory
     ) {
 
         return declare(null, {
@@ -40,7 +34,6 @@ define([
             data: [],
             mstore: null,
             maxid: 0,
-            structure: null,
 
             idProperty: "id",
 
@@ -49,9 +42,9 @@ define([
             },
 
             addRow: function() {
-                if (this.tableGrid && this.structure) {
+                if (this.tableGrid && this.tableGrid.structure) {
                     var newItem = {};
-                    this.structure.forEach(function (column) {
+                    this.tableGrid.structure.forEach(function (column) {
                         newItem[column.id] = "";
                     }, this);
                     newItem.id = this.maxid+1;
@@ -64,7 +57,7 @@ define([
             },
 
             delRow: function() {
-                if (this.structure && this.tableGrid && this.tableGrid.body._focusCellRow) {
+                if (this.tableGrid && this.tableGrid.structure && this.tableGrid.body._focusCellRow) {
                     var row = this.tableGrid.body._focusCellRow;
                     if (row) {
                         var id = row;
@@ -76,13 +69,23 @@ define([
                 }
             },
 
+            setData: function(data) {
+                this.mstore.setData(data);
+            },
+
+            refreshGrid: function() {
+                if (this.tableGrid) {
+                    this.tableGrid.model.clearCache();
+                    this.tableGrid.setStore(this.mstore);
+                    this.tableGrid.body.refresh();
+                }
+            },
+
             createGrid: function() {
                 if (this.data) {
                     this.mstore.setData(this.data);
                     if (this.tableGrid) {
-                        this.tableGrid.model.clearCache();
-                        this.tableGrid.setStore(this.mstore);
-                        this.tableGrid.body.refresh();
+                        this.refreshGrid();
                     } else {
                         var toolbar = new Toolbar({}, "toolbar");
                         var addButton = new Button({
@@ -93,7 +96,7 @@ define([
                         var delButton = new Button({
                             label: common.configPane.entryTemplatesSection.btnDel,
                             iconClass: "dijitIconDelete",
-                            onClick: lang.hitch(this, this.delRow)
+                            onClick: this.delRow.bind(this)
                         });
                         toolbar.addChild(addButton);
                         toolbar.addChild(delButton);
@@ -126,7 +129,7 @@ define([
                         };
                         this.tableGrid.startup();
                         this.tableGrid.body.refresh();
-                        this.tablePane.addChild(this.tableGrid);
+                        this.tableGrid.placeAt(this.tablePane);
                     }
                 }
             },

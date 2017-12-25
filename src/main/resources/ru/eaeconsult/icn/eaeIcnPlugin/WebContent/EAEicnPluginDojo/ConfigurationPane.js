@@ -20,8 +20,7 @@ define([
         "dojo/store/Memory",
         "dojo/on",
         "dijit/form/CheckBox",
-        "./widgets/ConfigPaneEntryTemplates",
-        "dojo/domReady!"
+        "./widgets/ConfigPaneItemTypes"
     ],
     function(
         lang,
@@ -45,7 +44,7 @@ define([
         Memory,
         on,
         CheckBox,
-        ConfigPaneEntryTemplates
+        ConfigPaneItemTypes
     ) {
 
         return declare("EAEicnPluginDojo.ConfigurationPane", [ PluginConfigurationPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -62,13 +61,18 @@ define([
 
             startup: function() {
                 this.inherited(arguments);
-                this.et = new ConfigPaneEntryTemplates({
-                    data: this.jsonConfig.etDataArray,
-                    parentWidget: this
-                });
-                this.et.placeAt(this.etTablePane.domNode);
-                this.et.startup();
-                this.et.createGrid();
+                //Item types grid
+                this.itemtypesTablePane.parentWidget = this;
+                if (this.jsonConfig.itDataArray) {
+                    this.itemtypesTablePane.setData(this.jsonConfig.itDataArray);
+                    this.itemtypesTablePane.refreshGrid();
+                }
+                //Desktops grid
+                this.desktopsTablePane.parentWidget = this;
+                if (this.jsonConfig.dtDataArray) {
+                    this.desktopsTablePane.setData(this.jsonConfig.dtDataArray);
+                    this.desktopsTablePane.refreshGrid();
+                }
             },
 
             load: function(callback) {
@@ -76,183 +80,6 @@ define([
                     this.jsonConfig = JSON.parse(this.configurationString);
                     this.externalRestServiceUrl.set('value', this.jsonConfig.externalRestServiceUrl);
                 }
-                //this.createTypesGrid();
-                //this.createDesktopsGrid();
-            },
-
-            addEtRow: function() {
-                var newItem={
-                    id: this.maxid_et+1,
-                    objectType: "",
-                    objectTypeDisplay: "",
-                    entryTemplate: "",
-                    entryTemplateRO: "",
-                    uniqueProperty: "",
-                    noNew: false
-                };
-                this.mstore_et.add(newItem);
-                this.tableGrid.model.clearCache();
-                this.tableGrid.setStore(this.mstore_et);
-                this._onFieldChange();
-                this.maxid_et++;
-            },
-
-            addDtRow: function () {
-                var newItem={
-                    id: this.maxid_dt+1,
-                    desktopId: "",
-                    commonSearchTemplate: "",
-                    searchTreeJSON: "",
-                    searchViewsJSON: "",
-                    exportConfigJSON: "",
-                    searchOpen: false,
-                    useDataFilter: false
-                };
-                this.mstore_dt.add(newItem);
-                this.desktopsGrid.model.clearCache();
-                this.desktopsGrid.setStore(this.mstore_dt);
-                this._onFieldChange();
-                this.maxid_dt++;
-            },
-
-            delEtRow: function() {
-                var row = this.tableGrid.body._focusCellRow;
-                if (row) {
-                    var id = row;
-                    this.mstore_et.remove(id);
-                    this.tableGrid.model.clearCache();
-                    this.tableGrid.setStore(this.mstore_et);
-                    this._onFieldChange();
-                }
-            },
-
-            delDtRow: function() {
-                var row = this.desktopsGrid.body._focusCellRow;
-                if (row) {
-                    var id = row;
-                    this.mstore_dt.remove(id);
-                    this.desktopsGrid.model.clearCache();
-                    this.desktopsGrid.setStore(this.mstore_dt);
-                    this._onFieldChange();
-                }
-            },
-
-            createTypesGrid: function() {
-                if (this.tableGrid) {
-                    this.tableGrid.destroyRecursive();
-                }
-                var toolbar = new Toolbar({}, "toolbar");
-                var addButton = new Button({
-                    label: common.configPane.entryTemplatesSection.btnAdd,
-                    iconClass: "dijitIconNewTask",
-                    onClick: lang.hitch(this, this.addEtRow)
-                });
-                var delButton = new Button({
-                    label: common.configPane.entryTemplatesSection.btnDel,
-                    iconClass: "dijitIconDelete",
-                    onClick: lang.hitch(this, this.delEtRow)
-                });
-                toolbar.addChild(addButton);
-                toolbar.addChild(delButton);
-                toolbar.startup();
-                this.tableGrid = new Grid({
-                    cacheClass: Cache,
-                    store: this.mstore_et,
-                    selectRowTriggerOnCell: true,
-                    autoHeight: true,
-                    barTop: [
-                        toolbar
-                    ],
-                    style: {
-                        height: "100px",
-                        width: "100%"
-                    },
-                    structure:  common.configPane.entryTemplatesSection.structure,
-                    modules: [
-                        CellWidget,
-                        Edit,
-                        SelectRow,
-                        Bar
-                    ]
-                })
-                this.tableGrid.placeAt(this.etTablePane);
-
-                this.tableGrid.edit.connect(this.tableGrid.edit, "onApply", lang.hitch(this, function(){
-                    this._onFieldChange();
-                }))
-
-                if (this.jsonConfig && this.jsonConfig.etDataArray) {
-                    this.etdata=this.jsonConfig.etDataArray;
-                }
-
-                for (i=0; i<this.etdata.length; i++) {
-                    this.maxid_et = (this.etdata[i].id > this.maxid_et) ? this.etdata[i].id : this.maxid_et;
-                };
-
-                this.mstore_et = new Memory({data: this.etdata});
-                this.tableGrid.startup();
-                this.tableGrid.model.clearCache();
-                this.tableGrid.setStore(this.mstore_et);
-            },
-
-            createDesktopsGrid: function() {
-                if (this.desktopsGrid) {
-                    this.desktopsGrid.destroyRecursive();
-                }
-
-                var toolbar = new Toolbar({}, "toolbar");
-                var addButton = new Button({
-                    label: common.configPane.desktopsSection.btnAdd,
-                    iconClass: "dijitIconNewTask",
-                    onClick: lang.hitch(this, this.addDtRow)
-                });
-                var delButton = new Button({
-                    label: common.configPane.desktopsSection.btnDel,
-                    iconClass: "dijitIconDelete",
-                    onClick: lang.hitch(this, this.delDtRow)
-                });
-                toolbar.addChild(addButton);
-                toolbar.addChild(delButton);
-                toolbar.startup();
-
-                this.desktopsGrid = new Grid({
-                    cacheClass: Cache,
-                    store: this.mstore_dt,
-                    selectRowTriggerOnCell: true,
-                    autoHeight: true,
-                    barTop: [
-                        toolbar
-                    ],
-                    style: {
-                        height: "50px",
-                        width: "100%"
-                    },
-                    structure: common.configPane.desktopsSection.structure,
-                    modules: [
-                        CellWidget,
-                        Edit,
-                        SelectRow,
-                        Bar
-                    ]
-                })
-                this.desktopsGrid.placeAt(this.dtTablePane);
-
-                this.desktopsGrid.edit.connect(this.desktopsGrid.edit, "onApply", lang.hitch(this, function(){
-                    this._onFieldChange();
-                }))
-
-                if (this.jsonConfig && this.jsonConfig.desktopConfigsArray) {
-                    this.dtdata=this.jsonConfig.desktopConfigsArray;
-                }
-
-                for (i=0; i<this.dtdata.length; i++) {
-                    this.maxid_dt = (this.dtdata[i].id > this.maxid_dt) ? this.dtdata[i].id : this.maxid_dt;
-                };
-
-                this.mstore_dt = new Memory({data: this.dtdata});
-                this.desktopsGrid.startup();
-                this.desktopsGrid.model.clearCache();
-                this.desktopsGrid.setStore(this.mstore_dt);
             },
 
             _onFieldChange : function() {
@@ -261,20 +88,35 @@ define([
 
                 var paramAdmin = {};
                 paramAdmin.externalRestServiceUrl = this.externalRestServiceUrl.get('value');
-
-                var etDataArray = [];
-                for (i=0; i<this.et.mstore.data.length; i++) {
-                    etDataRow={};
-                    etDataRow.id = this.et.mstore.data[i].id;
-                    etDataRow.objectType = this.et.mstore.data[i].objectType;
-                    etDataRow.objectTypeDisplay = this.et.mstore.data[i].objectTypeDisplay;
-                    etDataRow.entryTemplate = this.et.mstore.data[i].entryTemplate;
-                    etDataRow.entryTemplateRO = this.et.mstore.data[i].entryTemplateRO;
-                    etDataRow.uniqueProperty = this.et.mstore.data[i].uniqueProperty;
-                    etDataRow.noNew = this.et.mstore.data[i].noNew;
-                    etDataArray.push(etDataRow);
+                //Item types grid
+                var itDataArray = [];
+                for (i=0; i<this.itemtypesTablePane.mstore.data.length; i++) {
+                    itDataRow={};
+                    itDataRow.id = this.itemtypesTablePane.mstore.data[i].id;
+                    itDataRow.objectType = this.itemtypesTablePane.mstore.data[i].objectType;
+                    itDataRow.objectTypeDisplay = this.itemtypesTablePane.mstore.data[i].objectTypeDisplay;
+                    itDataRow.entryTemplate = this.itemtypesTablePane.mstore.data[i].entryTemplate;
+                    itDataRow.entryTemplateRO = this.itemtypesTablePane.mstore.data[i].entryTemplateRO;
+                    itDataRow.uniqueProperty = this.itemtypesTablePane.mstore.data[i].uniqueProperty;
+                    itDataRow.noNew = this.itemtypesTablePane.mstore.data[i].noNew;
+                    itDataArray.push(itDataRow);
                 }
-                paramAdmin.etDataArray = etDataArray;
+                paramAdmin.itDataArray = itDataArray;
+                //Desktops grid
+                var dtDataArray = [];
+                for (i=0; i<this.desktopsTablePane.mstore.data.length; i++) {
+                    dtDataRow={};
+                    dtDataRow.id = this.desktopsTablePane.mstore.data[i].id;
+                    dtDataRow.desktopId = this.desktopsTablePane.mstore.data[i].desktopId;
+                    dtDataRow.commonSearchTemplate = this.desktopsTablePane.mstore.data[i].commonSearchTemplate;
+                    dtDataRow.searchTreeJSON = this.desktopsTablePane.mstore.data[i].searchTreeJSON;
+                    dtDataRow.searchViewsJSON = this.desktopsTablePane.mstore.data[i].searchViewsJSON;
+                    dtDataRow.exportConfigJSON = this.desktopsTablePane.mstore.data[i].exportConfigJSON;
+                    dtDataRow.searchOpen = this.desktopsTablePane.mstore.data[i].searchOpen;
+                    dtDataRow.useDataFilter = this.desktopsTablePane.mstore.data[i].useDataFilter;
+                    dtDataArray.push(dtDataRow);
+                }
+                paramAdmin.dtDataArray = dtDataArray;
 
                 this.configurationString = JSON.stringify(paramAdmin);
                 this.onSaveNeeded(true);

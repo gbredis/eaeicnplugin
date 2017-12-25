@@ -2,15 +2,15 @@
 	<div data-dojo-type="idx.layout.TitlePane" open="true" collapsible=false
 		data-dojo-attach-point="_entryTemplatesPane"
 		title="${_nls.configPane.entryTemplatesSection.title}">
-	    <div data-dojo-type="dijit/layout/ContentPane"
-				data-dojo-attach-point="etTablePane">
+	    <div data-dojo-type="EAEicnPluginDojo/widgets/ConfigPaneItemTypes"
+				data-dojo-attach-point="itemtypesTablePane">
 	    </div>
 	</div>
 	<div data-dojo-type="idx.layout.TitlePane" open="true" collapsible=false
 		 data-dojo-attach-point="_desktopsPane"
 		 title="${_nls.configPane.desktopsSection.title}">
-		<div data-dojo-type="dijit/layout/ContentPane"
-			 data-dojo-attach-point="dtTablePane">
+		<div data-dojo-type="EAEicnPluginDojo/widgets/ConfigPaneDesktops"
+			 data-dojo-attach-point="desktopsTablePane">
 		</div>
 	</div>
 	<div data-dojo-type="idx.layout.TitlePane" open="true" collapsible=false

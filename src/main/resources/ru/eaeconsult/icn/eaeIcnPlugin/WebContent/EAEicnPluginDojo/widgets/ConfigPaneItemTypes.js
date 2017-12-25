@@ -6,7 +6,8 @@ define([
         "dojo/i18n!../nls/common",
         "./TableMixin",
         "dijit/layout/ContentPane",
-        "dojo/text!./templates/ConfigPaneTable.html"
+        "dojo/text!./templates/ConfigPaneTable.html",
+        "dojo/domReady!"
     ],
     function(
         lang,
@@ -19,7 +20,7 @@ define([
         template
     ) {
 
-        return declare("EAEicnPluginDojo.widgets.ConfigPaneEntryTemplates", [ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin, TableMixin], {
+        return declare("EAEicnPluginDojo.widgets.ConfigPaneItemTypes", [ContentPane, _TemplatedMixin, _WidgetsInTemplateMixin, TableMixin], {
 
             widgetsInTemplate: true,
             templateString: template,
@@ -30,11 +31,11 @@ define([
             postCreate: function () {
                 this.inherited(arguments);
                 this.createEmptyStore();
+                this.createGrid();
             },
 
             startup: function() {
                 this.inherited(arguments);
-                //this.createGrid();
             },
 
             _onFieldChange: function() {
