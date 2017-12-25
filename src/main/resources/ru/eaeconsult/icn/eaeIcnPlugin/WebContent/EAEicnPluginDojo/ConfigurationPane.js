@@ -6,21 +6,7 @@ define([
         "ecm/widget/admin/PluginConfigurationPane",
         "dojo/text!./templates/ConfigurationPane.html",
         "dojo/i18n!./nls/common",
-        "ecm/model/Desktop",
-        "ecm/model/SearchQuery",
-        "ecm/model/ResultSet",
-        "gridx/Grid",
-        "gridx/core/model/cache/Sync",
-        "gridx/modules/Edit",
-        "gridx/modules/extendedSelect/Row",
-        "gridx/modules/CellWidget",
-        "gridx/modules/Bar",
-        "dijit/Toolbar",
-        "dijit/form/Button",
-        "dojo/store/Memory",
-        "dojo/on",
-        "dijit/form/CheckBox",
-        "./widgets/ConfigPaneItemTypes"
+        "ecm/model/Desktop"
     ],
     function(
         lang,
@@ -30,21 +16,7 @@ define([
         PluginConfigurationPane,
         template,
         common,
-        Desktop,
-        SearchQuery,
-        ResultSet,
-        Grid,
-        Cache,
-        Edit,
-        SelectRow,
-        CellWidget,
-        Bar,
-        Toolbar,
-        Button,
-        Memory,
-        on,
-        CheckBox,
-        ConfigPaneItemTypes
+        Desktop
     ) {
 
         return declare("EAEicnPluginDojo.ConfigurationPane", [ PluginConfigurationPane, _TemplatedMixin, _WidgetsInTemplateMixin], {
