@@ -18,6 +18,7 @@ import com.ibm.ecm.extension.PluginServiceCallbacks;
 import com.ibm.ecm.extension.PluginViewerDef;
 import com.ibm.ecm.extension.PluginRepositoryType;
 import com.ibm.ecm.extension.PluginAPI;
+import ru.eaeconsult.icn.eaeIcnPlugin.filters.GetDesktopRespFilter;
 import ru.eaeconsult.icn.eaeIcnPlugin.layouts.EAEMainLayout;
 
 import java.util.Locale;
@@ -144,6 +145,11 @@ public class EAEicnPlugin extends Plugin {
     }
 
     public PluginResponseFilter[] getResponseFilters() {
+        if (pluginResponseFilters.length == 0) {
+            pluginResponseFilters = new PluginResponseFilter[] {
+                    new GetDesktopRespFilter()
+            };
+        }
         return pluginResponseFilters;
     }
 

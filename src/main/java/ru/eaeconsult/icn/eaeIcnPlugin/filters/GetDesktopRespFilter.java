@@ -105,6 +105,23 @@ public class GetDesktopRespFilter extends PluginResponseFilter {
 			HttpServletRequest request, JSONObject jsonResponse) throws Exception {
 		String pluginConfString = callbacks.loadConfiguration();
 		JSONObject pluginConfData = JSONObject.parse(pluginConfString);
+        JSONObject allPluginSettingsJSON = null;
+        JSONObject pluginSettings = null;
+        if (jsonResponse.containsKey("pluginSettings")) {
+            allPluginSettingsJSON = (JSONObject) jsonResponse.get("pluginSettings");
+        } else {
+            allPluginSettingsJSON = new JSONObject();
+            jsonResponse.put("pluginSettings", allPluginSettingsJSON);
+        }
+        if (allPluginSettingsJSON.containsKey(PLUGIN_ID)) {
+            pluginSettings = (JSONObject) allPluginSettingsJSON.get(PLUGIN_ID);
+        } else {
+            pluginSettings = new JSONObject();
+            allPluginSettingsJSON.put(PLUGIN_ID, pluginSettings);
+        }
+
+        pluginSettings.put("pluginConfig", pluginConfData);
+
 		String featureConfString = callbacks.loadFeatureConfiguration(FEATURE_ID);
 
 		String searchTreeJSON = "";
@@ -139,22 +156,6 @@ public class GetDesktopRespFilter extends PluginResponseFilter {
 		DS_USER = (String) pluginConfData.get("dataSourceUser");
 		DS_PWD = (String) pluginConfData.get("dataSourcePwd");
 
-		JSONObject allPluginSettingsJSON = null;
-		JSONObject pluginSettings = null;
-		if (jsonResponse.containsKey("pluginSettings")) {
-			allPluginSettingsJSON = (JSONObject) jsonResponse.get("pluginSettings");
-		} else {
-			allPluginSettingsJSON = new JSONObject();
-			jsonResponse.put("pluginSettings", allPluginSettingsJSON);
-		}
-		if (allPluginSettingsJSON.containsKey(PLUGIN_ID)) {
-			pluginSettings = (JSONObject) allPluginSettingsJSON.get(PLUGIN_ID);
-		} else {
-			pluginSettings = new JSONObject();
-			allPluginSettingsJSON.put(PLUGIN_ID, pluginSettings);
-		}
-
-		pluginSettings.put("pluginConfig", pluginConfData);
 		//saveJson(jsonResponse, "c:\\Temp\\Z_Desktop.json");
 		if (!searchTreeJSON.equals("")) {
 			if (DS_NAME!=null && !DS_NAME.equals("") && !DS_USER.equals("") && !DS_PWD.equals("")) {
